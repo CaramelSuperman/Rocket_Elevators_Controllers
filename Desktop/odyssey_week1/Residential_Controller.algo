@@ -1,0 +1,139 @@
+
+
+DEFINE colunm
+SET colunm to Colunm 
+SET elevatorList to elevatorLIST array
+SET callBottonList to CallBOTTONlist array
+
+SEQUENCE findBestElevator using requestedFloor and requestedirection
+SET bestElevator to 0
+SET bestScore to 100
+SET floorDistanceList to EMPTY list 
+SET difference to 0
+
+for each elevator in colunm elevatorLIST
+    SET difference to absolute vlue of requestedFloor minus currentFLoor
+    ADD difference to floorDistanceList
+endfor
+
+SORT floorDistanceList from lowest difference to highest difference
+
+for each elevator in elevatorLIST
+    if requestedFloor equal to currentFLoor and elevator status is stop and DIrection equal requestedirection
+        SET bestScore to 1 
+
+    else if currentFLoor is bigger than requestedFloor and elevator status is moving and DIrection equal to requestedirection
+        SET bestScore to 2
+
+    else if  currentFLoor if lesser than requestedFloor and elevator status is moving and DIrection equal ti requestedirection
+        SET bestScore to 2
+
+    else if currentFLoor is bigger than requestedFloor and elevator status is idle and this elevator in floorDistanceList is lesser than the others
+        SET bestScore to 3
+
+    else if currentFLoor is lesser than requestedFloor and elevator status is idle and this elevator in floorDistanceList is lesser than the others
+        SET bestScore to 3
+
+    else if currentFLoor is bigger than requestedFloor and elevator status is moving and direction not equal to requestedirection 
+        SET bestScore to 4 
+
+    else if currentFLoor is lesser than requestedFloor and elevator status is moving and direction not equal to requestedirection 
+        SET bestScore to 4 
+
+    else if elevator status is idle 
+        SET bestScore to 5
+    end if
+end for
+
+SORT elevatorLIST from lowest bestScore to highest bestScore
+    SET bestElevator to elevator that got the lower bestScore
+    return bestElevator
+END SEQUENCE    
+
+SEQUENCE requestElevator using currentFLoor and DIrection 
+    SET ThechosenElevator to call findBestElevator with currentFLoor and DIrection
+
+    add currentFLoor to floorRequestList 
+
+    call ThechosenElevator moveElevator
+    return ThechosenElevator
+
+END DEFINE
+
+DEFINE doors
+
+    SEQUENCE openDoors
+        SET maxWeight to maxWEight
+        doors open equal true
+        open doors 
+        wait 10 seconds
+        check for weight 
+            if weight is equal or bigger than maxWEight
+            keep doors open and beep sound
+            else call closeDoors
+    END SEQUENCE        
+
+    SEQUENCE closeDoors
+    SET open equal false
+        close doors 
+    END SEQUENCE
+
+
+END DEFINE 
+
+DEFINE elevator using elevatorId and currentFloor
+SET elevatorId to elevatorID
+SET status to idle 
+SET currentFloor to currentFLoor
+SET direction to DIrection
+SET floorRequest to EMPTY list
+
+
+    SEQUENCE moveElevator
+        while floorRequestList equal not EMPTY
+            for each floor inside floorRequest
+              if currentFLoor is lesser than first element in floorRequest 
+                set DIrection to up
+                if doors open equal true 
+                    call closeDoors
+            endif
+            set status to moving
+
+            'moving up until there'
+                while currentFLoor is lesser than first element in floorRequest
+                    increment currentFLoor by 1
+                endwhile
+
+                call openDoors
+                SET status to stop
+                call closeDoors
+               else if currentFLoor is bigger than first element in floorRequest
+               SET DIrection to down
+                if doors open equal true
+                    call closeDoors
+                endif
+                SET status to moving   
+
+                 'moving down until there'
+
+                while currentFLoor is bigger than first element in floorRequest
+                    decrement currentFLoor by 1
+                endwhile
+
+                call openDoors
+                SET status to stop
+                call closeDoors
+            endif
+
+            REMOVE first element in floorRequest
+           endfor
+        endwhile           
+        set status to idle
+     END SEQUENCE   
+
+END DEFINE
+
+DEFINE callButton USING and direction
+SET 
+
+
