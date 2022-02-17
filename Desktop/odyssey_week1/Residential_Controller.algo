@@ -1,20 +1,21 @@
 
 
 DEFINE colunm
-SET colunm to Colunm 
-SET elevatorList to elevatorLIST array
-SET callBottonList to CallBOTTONlist array
+    
+    SET colunm to Colunm 
+    SET elevatorList to elevatorLIST array
+    SET floorList to FloorLIst array
 
-SEQUENCE findBestElevator using requestedFloor and requestedirection
-SET bestElevator to 0
-SET bestScore to 100
-SET floorDistanceList to EMPTY list 
-SET difference to 0
+    SEQUENCE findBestElevator using requestedFloor and requestedirection
+        SET bestElevator to 0
+        SET bestScore to 100
+        SET floorDistanceList to EMPTY list 
+        SET difference to 0
 
-for each elevator in colunm elevatorLIST
-    SET difference to absolute vlue of requestedFloor minus currentFLoor
-    ADD difference to floorDistanceList
-endfor
+    for each elevator in colunm elevatorLIST
+        SET difference to absolute vlue of requestedFloor minus currentFLoor
+        ADD difference to floorDistanceList
+    endfor
 
 SORT floorDistanceList from lowest difference to highest difference
 
@@ -81,13 +82,12 @@ DEFINE doors
 
 END DEFINE 
 
-DEFINE elevator using elevatorId and currentFloor
-SET elevatorId to elevatorID
-SET status to idle 
-SET currentFloor to currentFLoor
-SET direction to DIrection
-SET floorRequest to EMPTY list
-
+DEFINE Elevator using elevatorId and currentFloor
+    SET elevatorId to elevatorID
+    SET status to idle 
+    SET currentFloor to currentFloor
+    SET direction to DIrection
+    SET floorRequest to EMPTY list
 
     SEQUENCE moveElevator
         while floorRequestList equal not EMPTY
@@ -129,11 +129,40 @@ SET floorRequest to EMPTY list
            endfor
         endwhile           
         set status to idle
-     END SEQUENCE   
+     END SEQUENCE 
+
+     SEQUENCE requestFloor USING floor
+     add floor to floorRequestList
+     END SEQUENCE
+
+     
+         
 
 END DEFINE
 
-DEFINE callButton USING and direction
-SET 
 
+
+DEFINE callButton USING and direction and callButtonValue
+        SET callButtonValue to callButtonVALUE 
+        SET direction to directioN
+
+    SEQUENCE calculateButton using requestFloor
+        SET callButtonVALUE to requestFloor
+        
+        return callButtonVALUE
+    END SEQUENCE 
+
+    SEQUENCE callButtonPressed USING callButtonVALUE and directioN
+        SET bestELE call colunm requestElevator with callButtonVALUE and directioN
+        return bestELE
+    END SEQUENCE
+END DEFINE
+
+DEFINE floorRequestButton USING requestedFloor 
+    SET requestedFloor to requestedFloor
+
+    SEQUENCE requestButtonPressed USING requestFloor
+    call requestFloor with requestFloor 
+    END SEQUENCE
+END DEFINE
 
