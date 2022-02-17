@@ -1,0 +1,223 @@
+
+
+ DEFINE Battery USING id AND numberOfColumns AND minimumFloor AND maximumFloor AND numberOfElevatorsPerColumn
+    SET Id: id,
+    SET status: status,
+    SET columnsList TO EMPTY
+    
+    SEQUENCE createColumnsList USING numberOfColumns, numberOfElevatorsPerColumn, minimumFloor, maximumFloor
+        FOR EACH numberOfColumns
+            SET tempID = 1
+            ADD (INSTANTIATE Column WITH tempID AND numberOfElevatorsPerColumn AND minimumFloor AND maximumFloor AND numberServedFloors) TO columnsList
+            INCREMENT tempID by 1 
+        ENDFOR
+    END SEQUENCE
+
+    CALL createColumnsList WITH numberOfColumns
+
+    "Finding the number of floors for each column"
+    SEQUENCE calculateNumberOfFloorsPerColumn USING numberOfColumns AND numberOfFloors AND numberOfBasements AND minimumFloor AND maximumFloor                
+        IF numberOfBasements IS GREATER THAN zero THEN 
+            SET numberOfFloorsPerColumn TO (ROUND TO FLOOR (numberOfFloors DIVIDED BY (numberOfColumns - 1)))
+            SET remainingfloors TO (numberOfFloors MODULO (numberOfColumns - 1))
+        ELSE
+            SET numberOfFloorsPerColumn TO (ROUND TO FLOOR (numberOfFloors DIVIDED BY numberOfColumns))
+            SET remainingfloors TO (numberOfFloors MODULO numberOfColumns)
+        ENDIF
+
+        SET minimumFloor TO 1   
+        IF numberOfColumns IS EQUAL TO 1 THEN       "if there is just one column, it serves all the floors of the building"
+            SET numberServedFloors TO totalNumberOfFloors 
+            SET minimumFloor OF column TO minimumFloor  
+            SET maximumFloor OF column TO totalNumberOfFloors  
+        ELSE 
+            FOR EACH columnN IN columnsList "creating column list"
+                IF columnN is NOT the FIRST element OF columnsList OR numberOfBasements IS EQUAL TO zero THEN    
+                    SET numberServedFloors TO numberOfFloorsPerColumn 
+                    SET minimumFloor OF columnN TO (minimumFloor)
+                    SET maximumFloor OF columnN TO (minimumFloor + numberOfFloorsPerColumn - 1)
+                ENDIF
+                    SET minimumFloor TO (maximumFloor OF columnN + 1)
+            ENDFOR
+            IF remainingfloors IS NOT EQUAL TO zero THEN
+                SET maximumFloor OF the LAST column OF columnsList TO maximumFloor + remainingfloors
+                SET numberServedFloors TO numberOfFloorsPerColumn + remainingfloors
+            ENDIF
+            IF numberOfBasements IS GREATER THAN zero THEN
+                SET numberServedFloors OF first column OF columnsList TO numberOfBasements 
+                SET minimumFloor OF first column OF columnsList TO numberOfBasements
+                SET maximumFloor OF first column OF columnsList TO 1    
+            ENDIF
+        ENDIF
+    END SEQUENCE
+END DEFINE
+
+
+DEFINE Colunm with elevatorList and floorList
+    
+    SET colunm to Colunm 
+    SET elevatorList to elevatorLIST array
+    SET floorList to FloorLIst array
+
+    SEQUENCE findBestElevator using requestedFloor and requestedirection
+        SET bestElevator to 0
+        SET bestScore to 100
+        SET floorDistanceList to EMPTY list 
+        SET difference to 0
+
+    for each elevator in colunm elevatorLIST
+        SET difference to absolute vlue of requestedFloor minus currentFLoor
+        ADD difference to floorDistanceList
+    endfor
+
+SORT floorDistanceList from lowest difference to highest difference
+
+for each elevator in elevatorLIST
+    if requestedFloor equal to currentFLoor and elevator status is stop and DIrection equal requestedirection
+        SET bestScore to 1 
+
+    else if currentFLoor is bigger than requestedFloor and elevator status is moving and DIrection equal to requestedirection
+        SET bestScore to 2
+
+    else if  currentFLoor if lesser than requestedFloor and elevator status is moving and DIrection equal ti requestedirection
+        SET bestScore to 2
+
+    else if currentFLoor is bigger than requestedFloor and elevator status is idle and this elevator in floorDistanceList is lesser than the others
+        SET bestScore to 3
+
+    else if currentFLoor is lesser than requestedFloor and elevator status is idle and this elevator in floorDistanceList is lesser than the others
+        SET bestScore to 3
+
+    else if currentFLoor is bigger than requestedFloor and elevator status is moving and direction not equal to requestedirection 
+        SET bestScore to 4 
+
+    else if currentFLoor is lesser than requestedFloor and elevator status is moving and direction not equal to requestedirection 
+        SET bestScore to 4 
+
+    else if elevator status is idle 
+        SET bestScore to 5
+    end if
+end for
+
+SORT elevatorLIST from lowest bestScore to highest bestScore
+    SET bestElevator to elevator that got the lower bestScore
+    return bestElevator
+END SEQUENCE    
+
+SEQUENCE requestElevator using currentFLoor and DIrection 
+    SET ThechosenElevator to call findBestElevator with currentFLoor and DIrection
+
+    add currentFLoor to floorRequestList 
+
+    call ThechosenElevator moveElevator
+    return ThechosenElevator
+
+END DEFINE
+
+DEFINE Doors
+
+    SEQUENCE openDoors
+        SET maxWeight to maxWEight
+        doors open equal true
+        open doors 
+        wait 10 seconds
+        check for weight 
+            if weight is equal or bigger than maxWEight
+            keep doors open and beep sound
+            else call closeDoors
+    END SEQUENCE        
+
+    SEQUENCE closeDoors
+    SET open equal false
+        close doors 
+    END SEQUENCE
+
+
+END DEFINE 
+
+DEFINE Elevator using elevatorId and currentFloor
+    SET elevatorId to elevatorID
+    SET status to idle 
+    SET currentFloor to currentFloor
+    SET direction to DIrection
+    SET floorRequestList to EMPTY list
+
+    SEQUENCE moveElevator
+        while floorRequestList equal not EMPTY
+            for each floor inside floorRequest
+              if currentFLoor is lesser than first element in floorRequestList 
+                set DIrection to up
+                if doors open equal true 
+                    call closeDoors
+            endif
+            set status to moving
+
+            'moving up until there'
+                while currentFLoor is lesser than first element in floorRequestList
+                    increment currentFLoor by 1
+                endwhile
+
+                call openDoors
+                SET status to stop
+                call closeDoors
+               else if currentFLoor is bigger than first element in floorRequestList
+               SET DIrection to down
+                if doors open equal true
+                    call closeDoors
+                endif
+                SET status to moving   
+
+                 'moving down until there'
+
+                while currentFLoor is bigger than first element in floorRequestList
+                    decrement currentFLoor by 1
+                endwhile
+
+                call openDoors
+                SET status to stop
+                call closeDoors
+            endif
+
+            REMOVE first element in floorRequestList
+           endfor
+        endwhile           
+        set status to idle
+     END SEQUENCE 
+
+     SEQUENCE requestedFloor USING floor
+     add floor to floorRequestList
+     END SEQUENCE
+
+     
+         
+
+END DEFINE
+
+
+
+DEFINE CallButton USING and direction and callButtonValue
+        SET callButtonValue to callButtonVALUE 
+        SET direction to directioN
+
+    SEQUENCE calculateButton using requestedFloor
+        SET callButtonVALUE to requestedFloor
+        
+        return callButtonVALUE
+    END SEQUENCE 
+
+    SEQUENCE callButtonPressed USING callButtonVALUE and directioN
+        button pressed
+        SET bestELE call colunm requestElevator with callButtonVALUE and directioN
+        return bestELE
+    END SEQUENCE
+END DEFINE
+
+DEFINE FloorRequestButton USING requestedFloor 
+    SET ButtonRequestedFloor to requestedFloor
+
+    SEQUENCE requestButtonPressed USING ButtonRequestedFloor
+    button pressed
+    call requestedFloor with ButtonRequestedFloor 
+    call moveElevator
+    END SEQUENCE
+END DEFINE

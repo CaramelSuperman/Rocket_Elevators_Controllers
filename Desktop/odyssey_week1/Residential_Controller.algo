@@ -1,6 +1,6 @@
 
 
-DEFINE colunm
+DEFINE colunm with elevatorList and floorList
     
     SET colunm to Colunm 
     SET elevatorList to elevatorLIST array
@@ -61,7 +61,7 @@ SEQUENCE requestElevator using currentFLoor and DIrection
 
 END DEFINE
 
-DEFINE doors
+DEFINE Doors
 
     SEQUENCE openDoors
         SET maxWeight to maxWEight
@@ -87,12 +87,12 @@ DEFINE Elevator using elevatorId and currentFloor
     SET status to idle 
     SET currentFloor to currentFloor
     SET direction to DIrection
-    SET floorRequest to EMPTY list
+    SET floorRequestList to EMPTY list
 
     SEQUENCE moveElevator
         while floorRequestList equal not EMPTY
             for each floor inside floorRequest
-              if currentFLoor is lesser than first element in floorRequest 
+              if currentFLoor is lesser than first element in floorRequestList 
                 set DIrection to up
                 if doors open equal true 
                     call closeDoors
@@ -100,14 +100,14 @@ DEFINE Elevator using elevatorId and currentFloor
             set status to moving
 
             'moving up until there'
-                while currentFLoor is lesser than first element in floorRequest
+                while currentFLoor is lesser than first element in floorRequestList
                     increment currentFLoor by 1
                 endwhile
 
                 call openDoors
                 SET status to stop
                 call closeDoors
-               else if currentFLoor is bigger than first element in floorRequest
+               else if currentFLoor is bigger than first element in floorRequestList
                SET DIrection to down
                 if doors open equal true
                     call closeDoors
@@ -116,7 +116,7 @@ DEFINE Elevator using elevatorId and currentFloor
 
                  'moving down until there'
 
-                while currentFLoor is bigger than first element in floorRequest
+                while currentFLoor is bigger than first element in floorRequestList
                     decrement currentFLoor by 1
                 endwhile
 
@@ -125,13 +125,13 @@ DEFINE Elevator using elevatorId and currentFloor
                 call closeDoors
             endif
 
-            REMOVE first element in floorRequest
+            REMOVE first element in floorRequestList
            endfor
         endwhile           
         set status to idle
      END SEQUENCE 
 
-     SEQUENCE requestFloor USING floor
+     SEQUENCE requestedFloor USING floor
      add floor to floorRequestList
      END SEQUENCE
 
@@ -142,27 +142,30 @@ END DEFINE
 
 
 
-DEFINE callButton USING and direction and callButtonValue
+DEFINE CallButton USING and direction and callButtonValue
         SET callButtonValue to callButtonVALUE 
         SET direction to directioN
 
-    SEQUENCE calculateButton using requestFloor
-        SET callButtonVALUE to requestFloor
+    SEQUENCE calculateButton using requestedFloor
+        SET callButtonVALUE to requestedFloor
         
         return callButtonVALUE
     END SEQUENCE 
 
     SEQUENCE callButtonPressed USING callButtonVALUE and directioN
+        button pressed
         SET bestELE call colunm requestElevator with callButtonVALUE and directioN
         return bestELE
     END SEQUENCE
 END DEFINE
 
-DEFINE floorRequestButton USING requestedFloor 
-    SET requestedFloor to requestedFloor
+DEFINE FloorRequestButton USING requestedFloor 
+    SET ButtonRequestedFloor to requestedFloor
 
-    SEQUENCE requestButtonPressed USING requestFloor
-    call requestFloor with requestFloor 
+    SEQUENCE requestButtonPressed USING ButtonRequestedFloor
+    button pressed
+    call requestedFloor with ButtonRequestedFloor 
+    call moveElevator
     END SEQUENCE
 END DEFINE
 
