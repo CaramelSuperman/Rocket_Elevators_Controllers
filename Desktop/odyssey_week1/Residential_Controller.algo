@@ -1,11 +1,15 @@
 
 
-DEFINE colunm with elevatorList and floorList
+
+                "colunm class"
+DEFINE Colunm with elevatorList and floorList
     
     SET colunm to Colunm 
     SET elevatorList to elevatorLIST array
     SET floorList to FloorLIst array
 
+
+                "this sequence find the best elevator"
     SEQUENCE findBestElevator using requestedFloor and requestedirection
         SET bestElevator to 0
         SET bestScore to 100
@@ -50,38 +54,38 @@ SORT elevatorLIST from lowest bestScore to highest bestScore
     SET bestElevator to elevator that got the lower bestScore
     return bestElevator
 END SEQUENCE    
-
+            "  this class request the elevator "
 SEQUENCE requestElevator using currentFLoor and DIrection 
     SET ThechosenElevator to call findBestElevator with currentFLoor and DIrection
 
     add currentFLoor to floorRequestList 
 
-    call ThechosenElevator moveElevator
+    call  moveElevator with ThechosenElevator
     return ThechosenElevator
 
 END DEFINE
-
+    "Doors class"
 DEFINE Doors
 
+        "this sequence open the door"
     SEQUENCE openDoors
-        SET maxWeight to maxWEight
-        doors open equal true
+       doorsOpen equal true
         open doors 
         wait 10 seconds
-        check for weight 
-            if weight is equal or bigger than maxWEight
-            keep doors open and beep sound
-            else call closeDoors
+         call closeDoors
+         
     END SEQUENCE        
-
+        "this one closes the doors"
     SEQUENCE closeDoors
-    SET open equal false
-        close doors 
+        SET doorsOpen equal false
+        closedoors 
     END SEQUENCE
+
+    
 
 
 END DEFINE 
-
+        "the elevator class"
 DEFINE Elevator using elevatorId and currentFloor
     SET elevatorId to elevatorID
     SET status to idle 
@@ -89,7 +93,9 @@ DEFINE Elevator using elevatorId and currentFloor
     SET direction to DIrection
     SET floorRequestList to EMPTY list
 
-    SEQUENCE moveElevator
+
+        "this is the class the moves the elevator"
+    SEQUENCE moveElevator with elevatorID
         while floorRequestList equal not EMPTY
             for each floor inside floorRequest
               if currentFLoor is lesser than first element in floorRequestList 
@@ -130,7 +136,7 @@ DEFINE Elevator using elevatorId and currentFloor
         endwhile           
         set status to idle
      END SEQUENCE 
-
+            "this sequence puts the floors in the request list"
      SEQUENCE requestedFloor USING floor
      add floor to floorRequestList
      END SEQUENCE
@@ -141,7 +147,7 @@ DEFINE Elevator using elevatorId and currentFloor
 END DEFINE
 
 
-
+            "this class defines the call button"
 DEFINE CallButton USING and direction and callButtonValue
         SET callButtonValue to callButtonVALUE 
         SET direction to directioN
@@ -159,6 +165,7 @@ DEFINE CallButton USING and direction and callButtonValue
     END SEQUENCE
 END DEFINE
 
+            "this one defines the rquest button"
 DEFINE FloorRequestButton USING requestedFloor 
     SET ButtonRequestedFloor to requestedFloor
 
@@ -169,3 +176,10 @@ DEFINE FloorRequestButton USING requestedFloor
     END SEQUENCE
 END DEFINE
 
+                    "Scenario 1"
+
+       set first elevator currentFLoor to 2
+       set second elevator currentFLoor to 6
+
+       set call column requestElevator with callButtonVALUE 3 and directioN up returning elevator
+       call requestedFloor with 7         
