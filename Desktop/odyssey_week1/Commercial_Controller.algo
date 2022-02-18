@@ -254,6 +254,11 @@ DEFINE FloorRequestButton USING requestedFloor
     call moveElevator
     END SEQUENCE
 END DEFINE
+                "SCENERIOS"
+                set numberOfFloors to 60
+                set numberOfBasements to 6
+                set numberOfElevatorsPerColumn to 5
+
 
                 "scenario 1"
 
@@ -265,3 +270,42 @@ END DEFINE
 
                 set call column requestElevator with callButtonVALUE 1 and directioN up 
                     call requestedFloor with 20
+
+                "scenario 2"
+
+
+
+                set elevatorC1 currentFLoor to 1 moving to requestedFloor 21 
+                set elevatorC2 currentFLoor to 23 moving to requestedFloor 28 
+                set elevatorC3 currentFLoor to 33 moving to requestedFloor 1 
+                set elevatorC4 currentFLoor to 40 moving to requestedFloor 24 
+                set elevatorC5 currentFLoor to 39 moving to requestedFloor 1 
+
+                set call column requestElevator with callButtonVALUE 1 and directioN up 
+                    call requestedFloor with 36
+
+                     "scenario 3"
+
+
+
+                set elevatorD1 currentFLoor to 58 moving to requestedFloor 1 
+                set elevatorD2 currentFLoor to 50 moving to requestedFloor 60 
+                set elevatorD3 currentFLoor to 46 moving to requestedFloor 58 
+                set elevatorD4 currentFLoor to 1 moving to requestedFloor 54 
+                set elevatorD5 currentFLoor to 60 moving to requestedFloor 1 
+
+                set call column requestElevator with callButtonVALUE 54 and directioN up 
+                    call requestedFloor with 1
+
+                     "scenario 4"
+
+
+
+                set elevatorA1 currentFLoor to basement4 idle 
+                set elevatorA2 currentFLoor to 1 idle 
+                set elevatorA3 currentFLoor to basement3 moving to basement5 
+                set elevatorA4 currentFLoor to basement6 to 1 
+                set elevatorA5 currentFLoor to basement1 to basement6 
+
+                set call column requestElevator with callButtonVALUE basement3 and directioN up 
+                    call requestedFloor with 1
