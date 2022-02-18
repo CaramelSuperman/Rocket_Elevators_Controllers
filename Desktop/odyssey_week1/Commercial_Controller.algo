@@ -214,6 +214,7 @@ DEFINE Elevator using elevatorId and currentFloor
         endwhile           
         set status to idle
      END SEQUENCE 
+
             "this sequence puts the floors in the request list"
      SEQUENCE requestedFloor USING floor
      add floor to floorRequestList
@@ -253,3 +254,14 @@ DEFINE FloorRequestButton USING requestedFloor
     call moveElevator
     END SEQUENCE
 END DEFINE
+
+                "scenario 1"
+
+                set elevatorB1 currentFLoor to 20 moving to requestedFloor 5 
+                set elevatorB2 currentFLoor to 3 moving to requestedFloor 15 
+                set elevatorB3 currentFLoor to 13 moving to requestedFloor 1 
+                set elevatorB4 currentFLoor to 15 moving to requestedFloor 2 
+                set elevatorB5 currentFLoor to 6 moving to requestedFloor 1 
+
+                set call column requestElevator with callButtonVALUE 1 and directioN up 
+                    call requestedFloor with 20
