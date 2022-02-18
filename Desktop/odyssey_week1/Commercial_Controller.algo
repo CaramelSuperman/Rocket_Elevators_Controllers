@@ -1,6 +1,6 @@
 
 
- DEFINE Battery USING id AND numberOfColumns AND minimumFloor AND maximumFloor AND numberOfElevatorsPerColumn
+ DEFINE Battery USING id and numberOfColumns and minimumFloor and maximumFloor and numberOfElevatorsPerColumn
     SET Id: id,
     SET status: status,
     SET columnsList TO EMPTY
@@ -8,49 +8,74 @@
     SEQUENCE createColumnsList USING numberOfColumns, numberOfElevatorsPerColumn, minimumFloor, maximumFloor
         FOR EACH numberOfColumns
             SET tempID = 1
-            ADD (INSTANTIATE Column WITH tempID AND numberOfElevatorsPerColumn AND minimumFloor AND maximumFloor AND numberServedFloors) TO columnsList
+            ADD (INSTANTIATE Column with tempID and numberOfElevatorsPerColumn and minimumFloor and maximumFloor and numberServedFloors) TO columnsList
             INCREMENT tempID by 1 
         ENDFOR
     END SEQUENCE
 
-    CALL createColumnsList WITH numberOfColumns
+    CALL createColumnsList with numberOfColumns
 
     "Finding the number of floors for each column"
     SEQUENCE calculateNumberOfFloorsPerColumn USING numberOfColumns AND numberOfFloors AND numberOfBasements AND minimumFloor AND maximumFloor                
-        IF numberOfBasements IS GREATER THAN zero THEN 
-            SET numberOfFloorsPerColumn TO (ROUND TO FLOOR (numberOfFloors DIVIDED BY (numberOfColumns - 1)))
-            SET remainingfloors TO (numberOfFloors MODULO (numberOfColumns - 1))
-        ELSE
-            SET numberOfFloorsPerColumn TO (ROUND TO FLOOR (numberOfFloors DIVIDED BY numberOfColumns))
-            SET remainingfloors TO (numberOfFloors MODULO numberOfColumns)
-        ENDIF
+        if numberOfBasements is biggest than zero  
+            SET numberOfFloorsPerColumn to (ROUND to FLOOR (numberOfFloors DIVIDED BY (numberOfColumns - 1)))
+            SET remainingfloors to (numberOfFloors MODULO (numberOfColumns - 1))
+        else
+            SET numberOfFloorsPerColumn to (ROUND to FLOOR (numberOfFloors DIVIDED BY numberOfColumns))
+            SET remainingfloors to (numberOfFloors MODULO numberOfColumns)
+        endif
 
-        SET minimumFloor TO 1   
-        IF numberOfColumns IS EQUAL TO 1 THEN       "if there is just one column, it serves all the floors of the building"
-            SET numberServedFloors TO totalNumberOfFloors 
-            SET minimumFloor OF column TO minimumFloor  
-            SET maximumFloor OF column TO totalNumberOfFloors  
-        ELSE 
-            FOR EACH columnN IN columnsList "creating column list"
-                IF columnN is NOT the FIRST element OF columnsList OR numberOfBasements IS EQUAL TO zero THEN    
-                    SET numberServedFloors TO numberOfFloorsPerColumn 
-                    SET minimumFloor OF columnN TO (minimumFloor)
-                    SET maximumFloor OF columnN TO (minimumFloor + numberOfFloorsPerColumn - 1)
-                ENDIF
-                    SET minimumFloor TO (maximumFloor OF columnN + 1)
-            ENDFOR
-            IF remainingfloors IS NOT EQUAL TO zero THEN
-                SET maximumFloor OF the LAST column OF columnsList TO maximumFloor + remainingfloors
-                SET numberServedFloors TO numberOfFloorsPerColumn + remainingfloors
-            ENDIF
-            IF numberOfBasements IS GREATER THAN zero THEN
-                SET numberServedFloors OF first column OF columnsList TO numberOfBasements 
-                SET minimumFloor OF first column OF columnsList TO numberOfBasements
-                SET maximumFloor OF first column OF columnsList TO 1    
-            ENDIF
-        ENDIF
+        SET minimumFloor to 1   
+        if numberOfColumns is equal to 1  "if there is just one column, it serves all the floors of the building"
+            SET numberServedFloors to totalNumberOfFloors 
+            SET minimumFloor of column to minimumFloor  
+            SET maximumFloor of column to totalNumberOfFloors  
+        else 
+            for each columnN in columnsList "creating column list"
+                if columnN is not the first element of columnsList OR numberOfBasements is equal to zero     
+                    SET numberServedFloors to numberOfFloorsPerColumn 
+                    SET minimumFloor of columnN to (minimumFloor)
+                    SET maximumFloor of columnN to (minimumFloor + numberOfFloorsPerColumn - 1)
+                endif
+                    SET minimumFloor to (maximumFloor of columnN + 1)
+            endfor
+            if remainingfloors is not equal to zero 
+                SET maximumFloor of the last column of columnsList to maximumFloor + remainingfloors
+                SET numberServedFloors to numberOfFloorsPerColumn + remainingfloors
+            endif
+            if numberOfBasements is bigger than zero 
+                SET numberServedFloors of first column of columnsList to numberOfBasements 
+                SET minimumFloor of first column of columnsList to numberOfBasements
+                SET maximumFloor of first column of columnsList to 1    
+            endif
+        endif
     END SEQUENCE
+
+    SEQUENCE buttonList with numberServedFloors
+        SET buttons to numberServedFloors
+
+    END SEQUENCE
+floor display uses battery 
+tells the battery when someone uses it
+
+    SEQUENCE choseColumn using floorDisplay (ButtonsDIsplayAndValue) 
+         SET bestColumn to bestCOLUm
+          while bestcolum is null 
+            if ButtonsDIsplayAndValue is inside an element of columnsList
+            bestCOLUm equal to that element 
+          endwhile
+          call findBestElevator    
+
 END DEFINE
+
+DEFINE floorDisplay USING numberServedFloors
+SET ButtonsDisplay to ButtonsDIsplay
+SET numberServedFloors to numberServedFLOORS
+
+    SEQUENCE ButtonsDIsplayAndValue using numberServedFLOORS
+        SET ButtonsDIsplay to numberServedFloors
+        Display ButtonsDIsplay
+    END SEQUENCE
 
 
 DEFINE Colunm with elevatorList and floorList
